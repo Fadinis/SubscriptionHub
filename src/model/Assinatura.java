@@ -13,7 +13,8 @@ public class Assinatura {
     private String status;
     private Categoria categoria;
     private List<Alerta> alertas;
-    private Periodicidade periodicidade; // Novo campo
+    private int usuarioId; // Associacao com o proprietario
+    private Periodicidade periodicidade;
 
     public Assinatura() {
         this.alertas = new ArrayList<>();
@@ -30,9 +31,10 @@ public class Assinatura {
         this.categoria = categoria;
     }
 
-    public Assinatura(int id, String nomeServico, double valor, Date dataVencimento, String status, Categoria categoria, Periodicidade periodicidade) {
+    public Assinatura(int id, String nomeServico, double valor, Date dataVencimento, String status, Categoria categoria, Periodicidade periodicidade, int usuarioId) {
         this(id, nomeServico, valor, dataVencimento, status, categoria);
         this.periodicidade = periodicidade;
+        this.usuarioId = usuarioId;
     }
 
     /**
@@ -149,4 +151,7 @@ public class Assinatura {
 
     public Periodicidade getPeriodicidade() { return periodicidade; }
     public void setPeriodicidade(Periodicidade periodicidade) { this.periodicidade = periodicidade; }
+
+    public int getUsuarioId() { return usuarioId; }
+    public void setUsuarioId(int usuarioId) { this.usuarioId = usuarioId; }
 }

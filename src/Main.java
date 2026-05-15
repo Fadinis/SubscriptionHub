@@ -12,10 +12,14 @@ public class Main {
         System.out.println("   SUBSCRIPTION HUB - TESTE INTEGRAL DO SISTEMA  ");
         System.out.println("=================================================\n");
 
-        // 1. SETUP DE CONTROLADORES
+        // 1. SETUP DE CONTROLADORES E REDE
         ControladorAssinatura ctrlAssinatura = new ControladorAssinatura();
         ControladorRelatorio ctrlRelatorio = new ControladorRelatorio();
         ControladorAlerta ctrlAlerta = new ControladorAlerta();
+        
+        // Requisito RS-02: Iniciar camada de rede para multiplos usuarios
+        network.ServidorSocket servidor = new network.ServidorSocket(ctrlAssinatura);
+        servidor.iniciarServidor();
 
         // 2. SETUP DE DADOS BASE
         Categoria streaming = new Categoria(1, "Streaming", "Entretenimento");
@@ -26,28 +30,44 @@ public class Main {
         Usuario maria = new Usuario(3, "Maria Santos", "maria@email.com", "m123");
         Administrador admin = new Administrador(2, "Admin Master", "admin@hub.com", "admin_hash", 99);
 
+        // --- [MODULO 0]: SEGURANCA & PERSISTENCIA ---
+        System.out.println("--- [0] Módulo Segurança: Teste de Hashing ---");
+        System.out.println("Senha informada: 'hash123'");
+        System.out.println("Hash gerado: " + joao.getSenhaHash());
+        
+        System.out.print("Tentativa de login (correta): ");
+        boolean loginSucesso = joao.autenticar("hash123");
+        System.out.println(loginSucesso ? "SUCESSO" : "FALHA");
+        
+        System.out.print("Tentativa de login (errada): ");
+        boolean loginFalha = joao.autenticar("senha_errada");
+        System.out.println(loginFalha ? "SUCESSO" : "FALHA");
+        System.out.println();
+
         // --- [MODULO 1]: CADASTRO (Diagrama de Atividade c/ Loop de Correcao) ---
         System.out.println("--- [1] Módulo Cadastro: Teste de Retentativa ---");
         // Tentativa de cadastro invalido (nome vazio, valor negativo)
-        Assinatura subInvalida = new Assinatura(1, "", -50.0, null, "", streaming, Periodicidade.MENSAL);
+        Assinatura subInvalida = new Assinatura(1, "", -50.0, null, "", streaming, Periodicidade.MENSAL, joao.getId());
         ctrlAssinatura.cadastrarAssinatura(subInvalida, 2); // Tenta 2 vezes (corrigindo no loop)
         
         // Adicionando manualmente outras assinaturas para os testes
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 2);
-        Assinatura netflix = new Assinatura(2, "Netflix", 55.90, cal.getTime(), "Ativo", streaming, Periodicidade.MENSAL);
+        Assinatura netflix = new Assinatura(2, "Netflix", 55.90, cal.getTime(), "Ativo", streaming, Periodicidade.MENSAL, joao.getId());
         
         cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 15);
-        Assinatura adobe = new Assinatura(3, "Adobe Cloud", 1200.00, cal.getTime(), "Ativo", trabalho, Periodicidade.ANUAL);
+        Assinatura adobe = new Assinatura(3, "Adobe Cloud", 1200.00, cal.getTime(), "Ativo", trabalho, Periodicidade.ANUAL, joao.getId());
         
         cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_MONTH, 5);
-        Assinatura gamepass = new Assinatura(4, "Xbox GamePass", 45.00, cal.getTime(), "Ativo", games, Periodicidade.MENSAL);
+        Assinatura gamepass = new Assinatura(4, "Xbox GamePass", 45.00, cal.getTime(), "Ativo", games, Periodicidade.MENSAL, joao.getId());
 
-        joao.getAssinaturas().add(netflix);
-        joao.getAssinaturas().add(adobe);
-        joao.getAssinaturas().add(gamepass);
+        ctrlAssinatura.cadastrarAssinatura(netflix);
+        ctrlAssinatura.cadastrarAssinatura(adobe);
+        ctrlAssinatura.cadastrarAssinatura(gamepass);
+
+        joao.setAssinaturas(ctrlAssinatura.consultarAssinaturas(joao.getId(), ctrlAssinatura.getTodasAssinaturas()));
         System.out.println();
 
         // --- [MODULO 2]: PAINEL CENTRAL (Diagrama de Atividade c/ Fork/Join) ---
@@ -62,7 +82,7 @@ public class Main {
         // --- [MODULO 3]: GERENCIAMENTO (Edicao e Exclusao) ---
         System.out.println("--- [3] Módulo Gerenciamento: Editar e Excluir ---");
         System.out.println(">> Editando Netflix para Premium:");
-        Assinatura netflixPremium = new Assinatura(2, "Netflix Premium", 59.90, netflix.getDataVencimento(), "Ativo", streaming, Periodicidade.MENSAL);
+        Assinatura netflixPremium = new Assinatura(2, "Netflix Premium", 59.90, netflix.getDataVencimento(), "Ativo", streaming, Periodicidade.MENSAL, joao.getId());
         ctrlAssinatura.editarDados(netflix.getId(), netflixPremium, joao.getAssinaturas());
         
         System.out.println("\n>> Excluindo Adobe Cloud:");
@@ -71,8 +91,9 @@ public class Main {
 
         // --- [MODULO 4]: ORGANIZACAO (Filtrar por Categoria) ---
         System.out.println("--- [4] Módulo Organização: Agrupamento ---");
-        // Adicionando Disney+ para ter mais de um streaming
-        joao.getAssinaturas().add(new Assinatura(5, "Disney+", 33.90, new Date(), "Ativo", streaming, Periodicidade.MENSAL));
+        // Adicionando Disney+ via controlador para garantir persistencia
+        ctrlAssinatura.cadastrarAssinatura(new Assinatura(5, "Disney+", 33.90, new Date(), "Ativo", streaming, Periodicidade.MENSAL, joao.getId()));
+        joao.setAssinaturas(ctrlAssinatura.consultarAssinaturas(joao.getId(), ctrlAssinatura.getTodasAssinaturas()));
         
         Map<String, List<Assinatura>> agrupadas = ctrlAssinatura.organizarPorCategoria(joao.getAssinaturas());
         for (Map.Entry<String, List<Assinatura>> entry : agrupadas.entrySet()) {
@@ -82,7 +103,7 @@ public class Main {
 
         // --- [MODULO 5]: RELATORIOS (Financeiro e Exportacao) ---
         System.out.println("--- [5] Módulo Financeiro: Relatórios ---");
-        ctrlRelatorio.solicitarRelatorio(joao, 5, 2024);
+        ctrlRelatorio.solicitarRelatorio(joao, 5, 2026);
         ctrlRelatorio.exportarRelatorio(joao.getRelatorios().get(0), "PDF");
         System.out.println();
 

@@ -5,6 +5,7 @@ package model;
  */
 public enum Periodicidade {
     MENSAL("Mensal", 1),
+    SEMANAL("Semanal", 0), // Representa menos de um mes
     TRIMESTRAL("Trimestral", 3),
     SEMESTRAL("Semestral", 6),
     ANUAL("Anual", 12);

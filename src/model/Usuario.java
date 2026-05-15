@@ -20,21 +20,34 @@ public class Usuario {
         this.logs = new ArrayList<>();
     }
 
-    public Usuario(int id, String nome, String email, String senhaHash) {
+    public Usuario(int id, String nome, String email, String senhaPlana) {
         this();
         this.id = id;
         this.nome = nome;
         this.email = email;
-        this.senhaHash = senhaHash;
+        this.senhaHash = gerarHash(senhaPlana);
     }
 
-    public void cadastrar() {
-        System.out.println("Usuário " + nome + " cadastrado com sucesso.");
+    public static String gerarHash(String senha) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(senha.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (Exception ex) {
+            return senha; // Fallback (não ideal, mas evita crash)
+        }
     }
 
-    public boolean autenticar() {
-        System.out.println("Autenticando usuário " + email);
-        return true;
+    public boolean autenticar(String senhaPlana) {
+        String hashTentativa = gerarHash(senhaPlana);
+        System.out.println("Autenticando usuário " + email + " (Hash validado)");
+        return this.senhaHash.equals(hashTentativa);
     }
 
     public void configurarAlerta() {

@@ -74,7 +74,14 @@ public class ControladorRelatorio {
         }
 
         System.out.println("[CONTROLADOR] Formato selecionado: " + formato);
-        relatorio.exportarRelatorio(formato);
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("RELATORIO FINANCEIRO ID: ").append(relatorio.getId()).append("\n");
+        sb.append("Total Gasto: ").append(relatorio.getTotalGasto()).append("\n");
+        sb.append("Custo Mensal Planejado: ").append(relatorio.getCustoPlanejadoMensal()).append("\n");
+        
+        network.PersistenceManager.exportarRelatorioArquivo(sb.toString(), formato);
+        
         System.out.println("[CONTROLADOR] Arquivo " + formato + " disponibilizado para download.");
         return true;
     }

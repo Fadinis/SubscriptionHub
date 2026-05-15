@@ -35,9 +35,17 @@ public class RelatorioFinanceiro {
 
     public List<Assinatura> buscarDadosAssinaturas(int mes, int ano, List<Assinatura> todasAssinaturas) {
         List<Assinatura> resultado = new ArrayList<>();
+        java.util.Calendar cal = java.util.Calendar.getInstance();
+
         for (Assinatura a : todasAssinaturas) {
-            if (a.getStatus() != null && a.getStatus().equalsIgnoreCase("Ativo")) {
-                resultado.add(a);
+            if (a.getStatus() != null && a.getStatus().equalsIgnoreCase("Ativo") && a.getDataVencimento() != null) {
+                cal.setTime(a.getDataVencimento());
+                int m = cal.get(java.util.Calendar.MONTH) + 1; // Janeiro = 0
+                int y = cal.get(java.util.Calendar.YEAR);
+
+                if (m == mes && y == ano) {
+                    resultado.add(a);
+                }
             }
         }
         return resultado;

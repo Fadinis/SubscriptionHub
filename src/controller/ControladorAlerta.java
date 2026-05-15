@@ -1,9 +1,6 @@
 package controller;
-
-import model.Alerta;
-import model.Assinatura;
-import model.LogAcao;
-import model.Usuario;
+import model.*;
+import network.PersistenceManager;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -107,6 +104,7 @@ public class ControladorAlerta {
             "sistema-alertas"
         );
         log.registrarLog();
+        PersistenceManager.registrarLogLocal(mensagem);
         logsAlerta.add(log);
     }
 

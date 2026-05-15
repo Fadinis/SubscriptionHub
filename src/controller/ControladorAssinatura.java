@@ -1,9 +1,6 @@
 package controller;
-
-import model.Assinatura;
-import model.Alerta;
-import model.Categoria;
-import model.LogAcao;
+import model.*;
+import network.PersistenceManager;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,7 +21,7 @@ public class ControladorAssinatura {
     private List<LogAcao> logs;
 
     public ControladorAssinatura() {
-        this.todasAssinaturas = new ArrayList<>();
+        this.todasAssinaturas = PersistenceManager.carregarAssinaturas();
         this.logs = new ArrayList<>();
     }
 
@@ -149,6 +146,15 @@ public class ControladorAssinatura {
     }
 
     /**
+     * Requisito 2.3: Visao geral do sistema para Administradores.
+     * Retorna todas as assinaturas cadastradas no sistema, independente do usuario.
+     */
+    public List<Assinatura> visaoGeralSistema(Administrador admin) {
+        System.out.println("[ADMIN] Administrador '" + admin.getNome() + "' solicitou visao geral do sistema.");
+        return todasAssinaturas;
+    }
+
+    /**
      * Calcula os proximos vencimentos das assinaturas.
      */
     public Map<String, Object> calcularVencimentos(List<Assinatura> assinaturas) {
@@ -217,6 +223,12 @@ public class ControladorAssinatura {
         if (alvo != null) {
             boolean sucesso = alvo.editarAssinatura(novosDados);
             if (sucesso) {
+                // Sincronizar com a lista global se nao for a mesma
+                if (banco != todasAssinaturas && !todasAssinaturas.contains(alvo)) {
+                   // Alvo ja deve estar em todasAssinaturas se foi carregado corretamente
+                }
+                PersistenceManager.salvarAssinaturas(todasAssinaturas);
+                PersistenceManager.salvarLog("Assinatura editada: ID " + id);
                 System.out.println("[SISTEMA] exibirConfirmacao(): Alteracoes salvas com sucesso.");
                 return true;
             }
@@ -235,6 +247,9 @@ public class ControladorAssinatura {
             boolean sucesso = alvo.excluirAssinatura(id);
             if (sucesso) {
                 banco.remove(alvo);
+                todasAssinaturas.remove(alvo); // Remove da lista global tambem
+                PersistenceManager.salvarAssinaturas(todasAssinaturas);
+                PersistenceManager.salvarLog("Assinatura excluida: ID " + id);
                 System.out.println("[SISTEMA] exibirConfirmacao(): Assinatura removida com sucesso.");
                 return true;
             }
@@ -307,6 +322,20 @@ public class ControladorAssinatura {
 
             // Decisao: Dados Validos?
             if (assinatura.validarDados()) {
+                // Verificar se ID ja existe para evitar duplicatas (Persistencia Inteligente)
+                boolean jaExiste = false;
+                for (Assinatura a : todasAssinaturas) {
+                    if (a.getId() == assinatura.getId()) {
+                        jaExiste = true;
+                        break;
+                    }
+                }
+
+                if (jaExiste) {
+                    System.out.println("[CADASTRO] Aviso: Assinatura com ID " + assinatura.getId() + " ja existe. Pulando cadastro.");
+                    return true; 
+                }
+
                 // Sim -> Salvar no Banco
                 System.out.println("[CADASTRO] Dados validos! Salvando no banco...");
                 boolean sucesso = assinatura.insertAssinatura();
@@ -314,6 +343,8 @@ public class ControladorAssinatura {
                 if (sucesso) {
                     assinatura.confirmacaoCadastro();
                     todasAssinaturas.add(assinatura);
+                    PersistenceManager.salvarAssinaturas(todasAssinaturas);
+                    PersistenceManager.salvarLog("Assinatura cadastrada: " + assinatura.getNomeServico() + " (ID: " + assinatura.getId() + ")");
 
                     // Registrar log
                     LogAcao log = new LogAcao(
