@@ -76,9 +76,28 @@ public class ControladorRelatorio {
         System.out.println("[CONTROLADOR] Formato selecionado: " + formato);
         
         StringBuilder sb = new StringBuilder();
-        sb.append("RELATORIO FINANCEIRO ID: ").append(relatorio.getId()).append("\n");
-        sb.append("Total Gasto: ").append(relatorio.getTotalGasto()).append("\n");
-        sb.append("Custo Mensal Planejado: ").append(relatorio.getCustoPlanejadoMensal()).append("\n");
+        sb.append("=====================================================\n");
+        sb.append("            RELATORIO FINANCEIRO DE ASSINATURAS       \n");
+        sb.append("=====================================================\n\n");
+        sb.append("ID do Relatorio: ").append(relatorio.getId()).append("\n");
+        sb.append("Periodo de Referencia: ").append(String.format("%02d/%d", relatorio.getMesReferencia(), relatorio.getAnoReferencia())).append("\n");
+        sb.append("Status dos Dados: ").append(relatorio.isDadosEncontrados() ? "Dados Encontrados" : "Sem dados no Periodo").append("\n\n");
+        
+        sb.append("----------------- RESUMO FINANCEIRO -----------------\n");
+        sb.append("Total Gasto (Desembolsado no Mes): R$ ").append(String.format("%.2f", relatorio.getTotalGasto())).append("\n");
+        sb.append("Custo Mensal Planejado Equivalente: R$ ").append(String.format("%.2f", relatorio.getCustoPlanejadoMensal())).append("\n\n");
+        
+        sb.append("---------------- GASTOS POR CATEGORIA ---------------\n");
+        if (relatorio.isDadosEncontrados()) {
+            for (java.util.Map.Entry<String, Double> entry : relatorio.getGastosPorCategoria().entrySet()) {
+                sb.append("  - ").append(entry.getKey()).append(": R$ ").append(String.format("%.2f", entry.getValue())).append("\n");
+            }
+        } else {
+            sb.append("  (Nenhum custo registrado para o periodo)\n");
+        }
+        sb.append("\n=====================================================\n");
+        sb.append("Gerado pelo sistema Subscription Hub em: ").append(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date())).append("\n");
+        sb.append("=====================================================\n");
         
         network.PersistenceManager.exportarRelatorioArquivo(sb.toString(), formato);
         

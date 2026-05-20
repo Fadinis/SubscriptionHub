@@ -136,11 +136,157 @@ public class PersistenceManager {
      */
     public static void exportarRelatorioArquivo(String conteudo, String formato) {
         String nomeArquivo = "relatorio_exportado." + formato.toLowerCase();
-        try (PrintWriter writer = new PrintWriter(new FileWriter(nomeArquivo))) {
-            writer.println(conteudo);
-            System.out.println("[SISTEMA] Relatorio exportado com sucesso para: " + nomeArquivo);
+        if (formato.equalsIgnoreCase("PDF")) {
+            byte[] pdfBytes = gerarPdfValido(conteudo);
+            try (FileOutputStream fos = new FileOutputStream(nomeArquivo)) {
+                fos.write(pdfBytes);
+                System.out.println("[SISTEMA] Relatorio exportado com sucesso para (PDF binario): " + nomeArquivo);
+            } catch (IOException e) {
+                System.err.println("[ERRO] Falha ao exportar relatorio em PDF: " + e.getMessage());
+            }
+        } else {
+            try (PrintWriter writer = new PrintWriter(new FileWriter(nomeArquivo))) {
+                writer.println(conteudo);
+                System.out.println("[SISTEMA] Relatorio exportado com sucesso para: " + nomeArquivo);
+            } catch (IOException e) {
+                System.err.println("[ERRO] Falha ao exportar relatorio: " + e.getMessage());
+            }
+        }
+    }
+
+    private static String escapePdfString(String input) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            if (c == '(' || c == ')' || c == '\\') {
+                sb.append('\\');
+                sb.append(c);
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static byte[] gerarPdfValido(String conteudo) {
+        try {
+            String[] lines = conteudo.split("\\r?\\n");
+            int linesPerPage = 45;
+            int numPages = (lines.length + linesPerPage - 1) / linesPerPage;
+            if (numPages == 0) numPages = 1;
+
+            List<List<String>> pages = new ArrayList<>();
+            for (int i = 0; i < numPages; i++) {
+                List<String> pageLines = new ArrayList<>();
+                int start = i * linesPerPage;
+                int end = Math.min(start + linesPerPage, lines.length);
+                for (int j = start; j < end; j++) {
+                    pageLines.add(lines[j]);
+                }
+                pages.add(pageLines);
+            }
+
+            ByteArrayOutputStream pdfOut = new ByteArrayOutputStream();
+            
+            // Header
+            pdfOut.write("%PDF-1.4\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            // Binary indicator
+            pdfOut.write("%\u00e2\u00e3\u00cf\u00d3\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            int totalObjects = 3 + 2 * numPages;
+            long[] offsets = new long[totalObjects + 1];
+
+            List<byte[]> objects = new ArrayList<>();
+            objects.add(new byte[0]); // Index 0 placeholder
+
+            // Obj 1: Catalog
+            String obj1 = "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n";
+            objects.add(obj1.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            // Obj 2: Pages
+            StringBuilder sbPages = new StringBuilder();
+            sbPages.append("2 0 obj\n<< /Type /Pages /Kids [");
+            for (int i = 0; i < numPages; i++) {
+                sbPages.append(3 + i).append(" 0 R ");
+            }
+            sbPages.append("] /Count ").append(numPages).append(" >>\nendobj\n");
+            objects.add(sbPages.toString().getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            int fontObjId = 3 + 2 * numPages;
+
+            // Page Objects (3 to 2 + numPages)
+            for (int i = 0; i < numPages; i++) {
+                int pageObjId = 3 + i;
+                int contentObjId = 3 + numPages + i;
+                String objPage = pageObjId + " 0 obj\n" +
+                        "<< /Type /Page\n" +
+                        "   /Parent 2 0 R\n" +
+                        "   /MediaBox [0 0 595.27 841.89]\n" +
+                        "   /Resources << /Font << /F1 " + fontObjId + " 0 R >> >>\n" +
+                        "   /Contents " + contentObjId + " 0 R\n" +
+                        ">>\nendobj\n";
+                objects.add(objPage.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            }
+
+            // Page Content Streams (3 + numPages to 2 + 2*numPages)
+            for (int i = 0; i < numPages; i++) {
+                int contentObjId = 3 + numPages + i;
+                List<String> pageLines = pages.get(i);
+                
+                ByteArrayOutputStream streamContent = new ByteArrayOutputStream();
+                streamContent.write("BT\n/F1 10 Tf\n12 TL\n50 780 Td\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                for (String line : pageLines) {
+                    String escaped = escapePdfString(line);
+                    streamContent.write(("(" + escaped + ") Tj\nT*\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                }
+                streamContent.write("ET\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                byte[] streamBytes = streamContent.toByteArray();
+
+                ByteArrayOutputStream objStream = new ByteArrayOutputStream();
+                String header = contentObjId + " 0 obj\n<< /Length " + streamBytes.length + " >>\nstream\n";
+                objStream.write(header.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                objStream.write(streamBytes);
+                objStream.write("\nendstream\nendobj\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+                
+                objects.add(objStream.toByteArray());
+            }
+
+            // Font Object
+            String objFont = fontObjId + " 0 obj\n" +
+                    "<< /Type /Font\n" +
+                    "   /Subtype /Type1\n" +
+                    "   /BaseFont /Courier\n" +
+                    ">>\nendobj\n";
+            objects.add(objFont.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            // Write all objects and record offsets
+            for (int id = 1; id <= totalObjects; id++) {
+                offsets[id] = pdfOut.size();
+                pdfOut.write(objects.get(id));
+            }
+
+            // Xref table
+            long xrefOffset = pdfOut.size();
+            pdfOut.write("xref\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write(("0 " + (totalObjects + 1) + "\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write("0000000000 65535 f \n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            for (int id = 1; id <= totalObjects; id++) {
+                String offsetStr = String.format("%010d", offsets[id]);
+                pdfOut.write((offsetStr + " 00000 n \n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            }
+
+            // Trailer
+            pdfOut.write("trailer\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write(("<< /Size " + (totalObjects + 1) + "\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write("   /Root 1 0 R\n>>\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write("startxref\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write((xrefOffset + "\n").getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+            pdfOut.write("%%EOF\n".getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
+
+            return pdfOut.toByteArray();
         } catch (IOException e) {
-            System.err.println("[ERRO] Falha ao exportar relatorio: " + e.getMessage());
+            System.err.println("[ERRO] Falha ao gerar PDF: " + e.getMessage());
+            return new byte[0];
         }
     }
 }

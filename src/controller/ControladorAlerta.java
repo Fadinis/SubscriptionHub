@@ -104,7 +104,7 @@ public class ControladorAlerta {
             "sistema-alertas"
         );
         log.registrarLog();
-        PersistenceManager.registrarLogLocal(mensagem);
+        PersistenceManager.salvarLog(mensagem);
         logsAlerta.add(log);
     }
 

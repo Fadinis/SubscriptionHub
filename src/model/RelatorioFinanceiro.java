@@ -98,6 +98,7 @@ public class RelatorioFinanceiro {
     public int getAnoReferencia() { return anoReferencia; }
     public double getTotalGasto() { return totalGasto; }
     public double getCustoPlanejadoMensal() { return custoPlanejadoMensal; }
+    public Map<String, Double> getGastosPorCategoria() { return gastosPorCategoria; }
 
     public boolean isDadosEncontrados() { return dadosEncontrados; }
 }
