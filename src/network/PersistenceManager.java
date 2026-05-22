@@ -145,8 +145,15 @@ public class PersistenceManager {
                 System.err.println("[ERRO] Falha ao exportar relatorio em PDF: " + e.getMessage());
             }
         } else {
-            try (PrintWriter writer = new PrintWriter(new FileWriter(nomeArquivo))) {
-                writer.println(conteudo);
+            try (FileOutputStream fos = new FileOutputStream(nomeArquivo)) {
+                // Adiciona o BOM do UTF-8 para que o Excel reconheça a codificação corretamente
+                fos.write(0xEF);
+                fos.write(0xBB);
+                fos.write(0xBF);
+                
+                try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(fos, java.nio.charset.StandardCharsets.UTF_8))) {
+                    writer.println(conteudo);
+                }
                 System.out.println("[SISTEMA] Relatorio exportado com sucesso para: " + nomeArquivo);
             } catch (IOException e) {
                 System.err.println("[ERRO] Falha ao exportar relatorio: " + e.getMessage());
@@ -256,6 +263,7 @@ public class PersistenceManager {
                     "<< /Type /Font\n" +
                     "   /Subtype /Type1\n" +
                     "   /BaseFont /Courier\n" +
+                    "   /Encoding /WinAnsiEncoding\n" +
                     ">>\nendobj\n";
             objects.add(objFont.getBytes(java.nio.charset.StandardCharsets.ISO_8859_1));
 

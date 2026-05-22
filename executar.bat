@@ -1,6 +1,19 @@
 @echo off
 chcp 65001 > nul
 
+:: Localizar javac e java
+set JAVAC_CMD=javac
+set JAVA_CMD=java
+where javac >nul 2>nul
+if %ERRORLEVEL% neq 0 (
+    for /d %%D in ("%USERPROFILE%\.jdks\*") do (
+        if exist "%%D\bin\javac.exe" (
+            set JAVAC_CMD="%%D\bin\javac.exe"
+            set JAVA_CMD="%%D\bin\java.exe"
+        )
+    )
+)
+
 echo ==========================================================
 echo    SUBSCRIPTION HUB - GERENCIADOR DE ASSINATURAS
 echo ==========================================================
@@ -9,7 +22,7 @@ echo.
 :: 1. Compilar o Projeto
 echo [INFO] Compilando codigo-fonte Java...
 if not exist bin mkdir bin
-"C:\Users\Admin\.jdks\ms-21.0.11\bin\javac.exe" -encoding UTF-8 -d bin -sourcepath src src/Main.java
+%JAVAC_CMD% -encoding UTF-8 -d bin -sourcepath src src/Main.java
 
 if %ERRORLEVEL% neq 0 (
     echo.
@@ -24,7 +37,7 @@ echo.
 
 :: 2. Executar a GUI
 echo [INFO] Iniciando a interface grafica...
-"C:\Users\Admin\.jdks\ms-21.0.11\bin\java.exe" -cp bin Main
+%JAVA_CMD% -cp bin Main
 
 if %ERRORLEVEL% neq 0 (
     echo.

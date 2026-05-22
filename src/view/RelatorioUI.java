@@ -95,6 +95,10 @@ public class RelatorioUI extends JDialog {
         cbMes = new JComboBox<>(new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}) {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_FIELD_BG);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_FIELD_BG, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_FIELD_BG);
@@ -112,6 +116,10 @@ public class RelatorioUI extends JDialog {
         cbAno = new JComboBox<>(new Integer[]{2025, 2026, 2027, 2028}) {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_FIELD_BG);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_FIELD_BG, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_FIELD_BG);
@@ -340,6 +348,31 @@ public class RelatorioUI extends JDialog {
                 item.add(lblVal, BorderLayout.EAST);
                 panelCategorias.add(item);
             }
+
+            JLabel lblAssinaturasTitulo = new JLabel("Assinaturas no Período:");
+            lblAssinaturasTitulo.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            lblAssinaturasTitulo.setForeground(COLOR_TEXT_PRIMARY);
+            lblAssinaturasTitulo.setBorder(new EmptyBorder(10, 0, 5, 0));
+            panelCategorias.add(lblAssinaturasTitulo);
+
+            for (model.Assinatura a : relatorioAtual.getAssinaturasNoPeriodo()) {
+                JPanel itemA = new JPanel(new BorderLayout());
+                itemA.setBackground(COLOR_FIELD_BG);
+                itemA.setBorder(new EmptyBorder(3, 5, 3, 5));
+                itemA.setMaximumSize(new Dimension(380, 25));
+
+                JLabel lblNomeA = new JLabel("  - " + a.getNomeServico() + " (" + a.getPeriodicidade().getDescricao() + ")");
+                lblNomeA.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                lblNomeA.setForeground(COLOR_TEXT_MUTED);
+
+                JLabel lblValA = new JLabel("R$ " + String.format("%.2f", a.getValor()) + "  ");
+                lblValA.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+                lblValA.setForeground(COLOR_TEXT_MUTED);
+
+                itemA.add(lblNomeA, BorderLayout.WEST);
+                itemA.add(lblValA, BorderLayout.EAST);
+                panelCategorias.add(itemA);
+            }
         } else {
             lblStatusRelatorio.setText("Sem assinaturas ativas com vencimento neste período.");
             lblStatusRelatorio.setForeground(new Color(239, 68, 68)); // Vermelho Coral
@@ -417,7 +450,7 @@ public class RelatorioUI extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
                                                       boolean isSelected, boolean cellHasFocus) {
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (isSelected) {
+            if (isSelected && index != -1) {
                 c.setBackground(selectionBg);
                 c.setForeground(Color.WHITE);
             } else {

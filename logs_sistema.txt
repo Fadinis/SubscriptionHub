@@ -1,0 +1,31 @@
+[21/05/2026] Novo usuário registrado: admin
+[21/05/2026] Login bem-sucedido do usuário: admin
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Assinatura cadastrada: Privacy Pipokinha (ID: 1)
+[21/05/2026] Alertas enviados para Bill Laelil: 1 notificacao(oes).
+[21/05/2026] Assinatura cadastrada: Netflix (ID: 2)
+[21/05/2026] Assinatura cadastrada: Xbox Gamepass (ID: 3)
+[21/05/2026] Assinatura cadastrada: Google AI PRO (ID: 4)
+[21/05/2026] Assinatura cadastrada: Spotify (ID: 5)
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Login bem-sucedido do usuário: admin
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Nenhuma assinatura proxima do vencimento para: Bill Laelil
+[21/05/2026] Login bem-sucedido do usuário: admin
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Login bem-sucedido do usuário: admin
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).
+[21/05/2026] Login bem-sucedido do usuário: admin
+[21/05/2026] Alertas enviados para Bill Laelil: 2 notificacao(oes).

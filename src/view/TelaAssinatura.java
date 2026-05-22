@@ -113,6 +113,10 @@ public class TelaAssinatura extends JDialog {
         cbCategoria = new JComboBox<>() {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_FIELD_BG);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_FIELD_BG, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_FIELD_BG);
@@ -130,6 +134,10 @@ public class TelaAssinatura extends JDialog {
         cbPeriodicidade = new JComboBox<>(Periodicidade.values()) {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_FIELD_BG);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_FIELD_BG, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_FIELD_BG);
@@ -146,6 +154,10 @@ public class TelaAssinatura extends JDialog {
         cbStatus = new JComboBox<>(new String[]{"Ativo", "Inativo"}) {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_FIELD_BG);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_FIELD_BG, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_FIELD_BG);
@@ -466,7 +478,7 @@ public class TelaAssinatura extends JDialog {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
                                                       boolean isSelected, boolean cellHasFocus) {
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (isSelected) {
+            if (isSelected && index != -1) {
                 c.setBackground(selectionBg);
                 c.setForeground(Color.WHITE);
             } else {

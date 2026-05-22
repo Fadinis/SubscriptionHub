@@ -77,7 +77,16 @@ public class ControladorAlerta {
                 long diffDias = diffMs / (1000 * 60 * 60 * 24);
 
                 if (diffDias >= 0 && diffDias <= diasAntecedencia) {
-                    vencendo.add(a);
+                    boolean possuiAlertaAberto = false;
+                    for (Alerta alerta : a.getAlertas()) {
+                        if (!alerta.isLido()) {
+                            possuiAlertaAberto = true;
+                            break;
+                        }
+                    }
+                    if (!possuiAlertaAberto) {
+                        vencendo.add(a);
+                    }
                 }
             }
         }

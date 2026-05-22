@@ -213,6 +213,10 @@ public class PainelUI extends JFrame {
         cbFiltroCategoria = new JComboBox<>(new String[]{"Todas"}) {
             @Override
             public void updateUI() {
+                UIManager.put("ComboBox.background", COLOR_CARD_ALT);
+                UIManager.put("ComboBox.foreground", COLOR_TEXT_PRIMARY);
+                UIManager.put("ComboBox.selectionBackground", COLOR_PRIMARY);
+                UIManager.put("ComboBox.selectionForeground", Color.WHITE);
                 setUI(new javax.swing.plaf.basic.BasicComboBoxUI());
                 setRenderer(new DarkComboBoxRenderer(COLOR_CARD_ALT, COLOR_TEXT_PRIMARY, COLOR_PRIMARY));
                 setBackground(COLOR_CARD_ALT);
@@ -749,7 +753,7 @@ public class PainelUI extends JFrame {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, 
                                                       boolean isSelected, boolean cellHasFocus) {
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (isSelected) {
+            if (isSelected && index != -1) {
                 c.setBackground(selectionBg);
                 c.setForeground(Color.WHITE);
             } else {

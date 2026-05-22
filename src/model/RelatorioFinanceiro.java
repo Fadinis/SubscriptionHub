@@ -12,10 +12,12 @@ public class RelatorioFinanceiro {
     private double totalGasto;
     private double custoPlanejadoMensal; // Novo: soma dos equivalentes mensais
     private Map<String, Double> gastosPorCategoria;
+    private List<Assinatura> assinaturasNoPeriodo;
     private boolean dadosEncontrados;
 
     public RelatorioFinanceiro() {
         this.gastosPorCategoria = new HashMap<>();
+        this.assinaturasNoPeriodo = new ArrayList<>();
         this.dadosEncontrados = false;
     }
 
@@ -23,6 +25,7 @@ public class RelatorioFinanceiro {
         this.mesReferencia = mes;
         this.anoReferencia = ano;
         List<Assinatura> dadosPeriodo = buscarDadosAssinaturas(mes, ano, assinaturas);
+        this.assinaturasNoPeriodo = dadosPeriodo;
 
         if (dadosPeriodo.isEmpty()) {
             this.dadosEncontrados = false;
@@ -43,7 +46,12 @@ public class RelatorioFinanceiro {
                 int m = cal.get(java.util.Calendar.MONTH) + 1; // Janeiro = 0
                 int y = cal.get(java.util.Calendar.YEAR);
 
-                if (m == mes && y == ano) {
+                int mesesDiferenca = (ano - y) * 12 + (mes - m);
+                int pMeses = a.getPeriodicidade() != null ? a.getPeriodicidade().getMeses() : 1;
+
+                if (pMeses == 0) {
+                    resultado.add(a); // Semanal
+                } else if (mesesDiferenca % pMeses == 0) {
                     resultado.add(a);
                 }
             }
@@ -99,6 +107,7 @@ public class RelatorioFinanceiro {
     public double getTotalGasto() { return totalGasto; }
     public double getCustoPlanejadoMensal() { return custoPlanejadoMensal; }
     public Map<String, Double> getGastosPorCategoria() { return gastosPorCategoria; }
+    public List<Assinatura> getAssinaturasNoPeriodo() { return assinaturasNoPeriodo; }
 
     public boolean isDadosEncontrados() { return dadosEncontrados; }
 }

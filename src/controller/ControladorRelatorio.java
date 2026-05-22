@@ -95,6 +95,18 @@ public class ControladorRelatorio {
         } else {
             sb.append("  (Nenhum custo registrado para o periodo)\n");
         }
+        sb.append("\n");
+
+        sb.append("---------------- ASSINATURAS NO PERIODO -------------\n");
+        if (relatorio.isDadosEncontrados()) {
+            for (model.Assinatura a : relatorio.getAssinaturasNoPeriodo()) {
+                sb.append("  - ").append(a.getNomeServico())
+                  .append(" (").append(a.getPeriodicidade().getDescricao()).append(")")
+                  .append(": R$ ").append(String.format("%.2f", a.getValor())).append("\n");
+            }
+        } else {
+            sb.append("  (Nenhuma assinatura ativa neste periodo)\n");
+        }
         sb.append("\n=====================================================\n");
         sb.append("Gerado pelo sistema Subscription Hub em: ").append(new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date())).append("\n");
         sb.append("=====================================================\n");
