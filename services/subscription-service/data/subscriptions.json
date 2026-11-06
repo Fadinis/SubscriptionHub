@@ -1,0 +1,19 @@
+[ {
+  "id" : 1,
+  "usuarioId" : 1,
+  "nomeServico" : "Netflix Premium",
+  "valor" : 55.9,
+  "dataVencimento" : 1794145142805,
+  "status" : "ATIVA",
+  "categoria" : "Streaming",
+  "periodicidade" : "MENSAL"
+}, {
+  "id" : 2,
+  "usuarioId" : 1,
+  "nomeServico" : "Spotify Familia",
+  "valor" : 34.9,
+  "dataVencimento" : 1795873142805,
+  "status" : "ATIVA",
+  "categoria" : "Musica",
+  "periodicidade" : "MENSAL"
+} ]

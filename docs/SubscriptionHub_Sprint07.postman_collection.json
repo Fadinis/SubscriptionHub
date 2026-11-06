@@ -1,0 +1,350 @@
+{
+  "info": {
+    "_postman_id": "a9182374-7c38-4e89-9821-subscriptionhub07",
+    "name": "SubscriptionHub - Sprint 07 (Microsserviços)",
+    "description": "Coleção de testes de API REST e integração entre microsserviços do Subscription Hub para a Sprint 07 da disciplina de PAES.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. User Service (Porta 8081)",
+      "item": [
+        {
+          "name": "Healthcheck User Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/users/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users", "health"]
+            }
+          }
+        },
+        {
+          "name": "Listar Todos os Usuários",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Usuário por ID (1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8081/api/users/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users", "1"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Usuário (Sucesso - 201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Lucas Ferreira\",\n  \"email\": \"lucas.ferreira@email.com\",\n  \"senha\": \"senhaForte123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Cadastrar Usuário (E-mail Duplicado - 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nome\": \"Joao Duplicado\",\n  \"email\": \"joao@email.com\",\n  \"senha\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/users",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users"]
+            }
+          }
+        },
+        {
+          "name": "Autenticar / Login (Sucesso - 200)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@email.com\",\n  \"senha\": \"senha123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/users/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users", "login"]
+            }
+          }
+        },
+        {
+          "name": "Autenticar / Login (Senha Incorreta - 401)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"joao@email.com\",\n  \"senha\": \"senhaErrada\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8081/api/users/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8081",
+              "path": ["api", "users", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Subscription Service (Porta 8082)",
+      "item": [
+        {
+          "name": "Healthcheck Subscription Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions", "health"]
+            }
+          }
+        },
+        {
+          "name": "Listar Todas as Assinaturas",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions"]
+            }
+          }
+        },
+        {
+          "name": "Buscar Assinaturas por Usuário (1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions/user/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions", "user", "1"]
+            }
+          }
+        },
+        {
+          "name": "Criar Assinatura (Integração MS-2 -> MS-1 - Sucesso 201)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 1,\n  \"nomeServico\": \"Disney+ Padrão\",\n  \"valor\": 43.90,\n  \"periodicidade\": \"MENSAL\",\n  \"categoria\": \"Streaming\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions"]
+            }
+          }
+        },
+        {
+          "name": "Criar Assinatura (Erro: Usuário Inexistente - 422)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 9999,\n  \"nomeServico\": \"Servico Fantasma\",\n  \"valor\": 30.00,\n  \"periodicidade\": \"MENSAL\",\n  \"categoria\": \"Outros\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions"]
+            }
+          }
+        },
+        {
+          "name": "Criar Assinatura (Erro: Valor Inválido - 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 1,\n  \"nomeServico\": \"Servico Valor Negativo\",\n  \"valor\": -10.00,\n  \"periodicidade\": \"MENSAL\",\n  \"categoria\": \"Outros\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions"]
+            }
+          }
+        },
+        {
+          "name": "Cancelar Assinatura (PUT 200)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8082/api/subscriptions/1/cancel",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8082",
+              "path": ["api", "subscriptions", "1", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Notification Service (Porta 8083)",
+      "item": [
+        {
+          "name": "Healthcheck Notification Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/notifications/health",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "notifications", "health"]
+            }
+          }
+        },
+        {
+          "name": "Disparar Checagem de Vencimentos (Integração MS-3 -> MS-2)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuarioId\": 1,\n  \"diasAntecedencia\": 5\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8083/api/notifications/check",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "notifications", "check"]
+            }
+          }
+        },
+        {
+          "name": "Listar Notificações do Usuário (1)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/notifications/user/1",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "notifications", "user", "1"]
+            }
+          }
+        },
+        {
+          "name": "Marcar Notificação como Lida (PUT 200)",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8083/api/notifications/1/read",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "8083",
+              "path": ["api", "notifications", "1", "read"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+
